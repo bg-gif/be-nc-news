@@ -1,4 +1,5 @@
 const connection = require('../db/connection');
+const { fetchUserById } = require('../models/users-model');
 
 exports.fetchAllArticles = () => {
 	return connection('articles').select('*');
@@ -33,11 +34,27 @@ exports.updateVotes = (article_id, newVotes) => {
 		.returning('*');
 };
 
-exports.sendComment = (newComment, article_id) => {
-	newComment.article_id = article_id;
-	newComment.author = newComment.username;
-	delete newComment.username;
+exports.sendComment = (body, author, article_id) => {
+	return Promise.all([
+		fetchUserById(author),
+		this.fetchArticleById(article_id)
+	]).then(() => {
+		const comment = { body, article_id, author };
+		return connection('comments')
+			.insert(comment)
+			.returning('*');
+	});
+};
+
+exports.fetchAllCommentsByArticleId = article_id => {
 	return connection('comments')
-		.insert(newComment)
-		.returning('*');
+		.select(
+			'comments.comment_id',
+			'comments.votes',
+			'comments.created_at',
+			'comments.author',
+			'comments.body'
+		)
+		.where('articles.article_id', article_id)
+		.join('articles', 'articles.author', 'comments.author');
 };

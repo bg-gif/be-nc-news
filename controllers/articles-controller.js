@@ -2,7 +2,8 @@ const {
 	fetchAllArticles,
 	fetchArticleById,
 	updateVotes,
-	sendComment
+	sendComment,
+	fetchAllCommentsByArticleId
 } = require('../models/articles-model');
 
 exports.getAllArticles = (req, res, next) => {
@@ -33,11 +34,20 @@ exports.patchVotes = (req, res, next) => {
 };
 
 exports.postComment = (req, res, next) => {
-	const newComment = req.body;
+	const { body, username } = req.body;
 	const { article_id } = req.params;
-	sendComment(newComment, article_id)
+	sendComment(body, username, article_id)
 		.then(([postedComment]) => {
 			res.status(201).send({ postedComment });
+		})
+		.catch(next);
+};
+
+exports.getAllCommentsByArticleId = (req, res, next) => {
+	const { article_id } = req.params;
+	fetchAllCommentsByArticleId(article_id)
+		.then(comments => {
+			res.status(200).send({ comments });
 		})
 		.catch(next);
 };
