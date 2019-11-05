@@ -11,7 +11,7 @@ exports.seed = function(knex) {
 	return knex.migrate
 		.rollback()
 		.then(() => {
-			knex.migrate.latest();
+			return knex.migrate.latest();
 		})
 		.then(() => {
 			const topicsInsertions = knex('topics').insert(topicsData, '*');
