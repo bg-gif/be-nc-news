@@ -4,14 +4,16 @@ exports.up = function(knex) {
 		table
 			.string('author')
 			.references('username')
-			.inTable('users');
+			.inTable('users')
+			.notNullable();
 		table
 			.integer('article_id')
 			.references('article_id')
-			.inTable('articles');
+			.inTable('articles')
+			.notNullable();
 		table.integer('votes').defaultTo(0);
-		table.timestamp('created_at');
-		table.text('body');
+		table.timestamp('created_at').defaultTo(knex.fn.now());
+		table.text('body').notNullable();
 	});
 };
 

@@ -253,6 +253,72 @@ describe('app', () => {
 							return Promise.all[promiseArr];
 						});
 					});
+					describe('/:article_id/comments', () => {
+						describe('GET', () => {});
+						describe('POST', () => {
+							it('status:201, responds with posted comment', () => {
+								return request
+									.post('/api/articles/3/comments')
+									.send({
+										username: 'icellusedkars',
+										body: 'This was proper shit'
+									})
+									.expect(201)
+									.then(({ body: { postedComment } }) => {
+										expect(postedComment).to.include.keys(
+											'author',
+											'article_id',
+											'votes',
+											'comment_id',
+											'body'
+										);
+									});
+							});
+							it('status:400, missing columns', () => {
+								return request
+									.post('/api/articles/1/comments')
+									.send({ body: 'This were not good' })
+									.expect(400)
+									.then(({ body: { msg } }) => {
+										expect(msg).to.equal('Bad Request');
+									});
+							});
+							it('status:400, extra columns', () => {
+								return request
+									.post('/api/articles/1/comments')
+									.send({
+										body: 'This were not good',
+										username: 'icellusedkars',
+										extra: 'column'
+									})
+									.expect(400)
+									.then(({ body: { msg } }) => {
+										expect(msg).to.equal('Bad Request');
+									});
+							});
+							it('status:400, invalid article id', () => {
+								return request
+									.post('/api/articles/steve/comments')
+									.send({
+										body: 'This were not good',
+										username: 'icellusedkars'
+									})
+									.expect(400)
+									.then(({ body: { msg } }) => {
+										expect(msg).to.equal('Bad Request');
+									});
+							});
+							it('status:422, unprocessable entity', () => {
+								return request
+									.post('/api/articles/1/comments')
+									.send({ body: 'This were not good', username: 123 })
+									.expect(422)
+									.then(({ body: { msg } }) => {
+										expect(msg).to.equal('Unprocessable Entity');
+									});
+							});
+						});
+					});
 				});
 			});
 		});

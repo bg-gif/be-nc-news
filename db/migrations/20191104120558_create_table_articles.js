@@ -2,7 +2,7 @@ exports.up = function(knex) {
 	return knex.schema.createTable('articles', table => {
 		table.increments('article_id');
 		table.string('title');
-		table.text('body');
+		table.text('body').notNullable;
 		table.integer('votes').defaultTo(0);
 		table
 			.string('topic')
@@ -11,7 +11,7 @@ exports.up = function(knex) {
 		table
 			.string('author')
 			.references('username')
-			.inTable('users');
+			.inTable('users').notNullable;
 		table.timestamp('created_at');
 	});
 };

@@ -32,3 +32,12 @@ exports.updateVotes = (article_id, newVotes) => {
 		.increment('votes', newVotes)
 		.returning('*');
 };
+
+exports.sendComment = (newComment, article_id) => {
+	newComment.article_id = article_id;
+	newComment.author = newComment.username;
+	delete newComment.username;
+	return connection('comments')
+		.insert(newComment)
+		.returning('*');
+};
