@@ -283,6 +283,14 @@ describe('app', () => {
 								expect(articles).to.be.descendingBy('votes');
 							});
 					});
+					it('status:400, bad sort query', () => {
+						return request
+							.get('/api/articles?sort_by=botes')
+							.expect(400)
+							.then(({ body: { msg } }) => {
+								expect(msg).to.equal('Bad Request');
+							});
+					});
 					it('status:200, order by query, defaulting to desc', () => {
 						return request
 							.get('/api/articles?order=desc')
@@ -499,13 +507,13 @@ describe('app', () => {
 										expect(comments).to.be.sortedBy('votes');
 									});
 							});
-							it('status:400, bad sort query: IS THIS NEEDED???', () => {
-								// return request
-								// 	.get('/api/articles/1/comments?sort_by=botes')
-								// 	.expect(400)
-								// 	.then(({ body: { msg } }) => {
-								// 		expect(msg).to.equal('Bad Request');
-								// 	});
+							it('status:400, bad sort query', () => {
+								return request
+									.get('/api/articles/1/comments?sort_by=botes')
+									.expect(400)
+									.then(({ body: { msg } }) => {
+										expect(msg).to.equal('Bad Request');
+									});
 							});
 							it('status:200, default order of desc', () => {
 								return request

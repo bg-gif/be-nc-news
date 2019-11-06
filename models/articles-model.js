@@ -80,7 +80,7 @@ exports.fetchAllCommentsByArticleId = (
 			'comments.author',
 			'comments.body'
 		)
-		.orderBy(sort_by, order)
+		.leftJoin('articles', 'articles.author', 'comments.author')
 		.where('articles.article_id', article_id)
-		.join('articles', 'articles.author', 'comments.author');
+		.orderBy(sort_by, order);
 };
