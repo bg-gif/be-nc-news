@@ -1,9 +1,12 @@
 process.env.NODE_ENV = 'test';
 const chai = require('chai');
 const { expect } = require('chai');
+const chaiSorted = require('chai-sorted');
 const app = require('../app');
 const request = require('supertest')(app);
 const connection = require('../db/connection');
+
+chai.use(chaiSorted);
 
 beforeEach(() => {
 	return connection.seed.run();
@@ -26,6 +29,99 @@ describe('app', () => {
 				});
 		});
 		describe('/api', () => {
+			describe('/comments', () => {
+				describe.only('/:commentId', () => {
+					describe('PATCH', () => {
+						it('status:200, updates comment and returns updated comment', () => {
+							return request
+								.patch('/api/comments/1')
+								.send({ inc_votes: 10 })
+								.expect(200)
+								.then(({ body: { updatedComment } }) => {
+									expect(updatedComment).to.eql({
+										comment_id: 1,
+										author: 'butter_bridge',
+										article_id: 9,
+										votes: 26,
+										created_at: '2017-11-22T12:36:03.389Z',
+										body:
+											"Oh, I've got compassion running out of my nose, pal! I'm the Sultan of Sentiment!"
+									});
+								});
+						});
+						it('status:400, invalid comment id responds with bad request', () => {
+							return request
+								.patch('/api/comments/one')
+								.send({ inc_votes: 10 })
+								.expect(400)
+								.then(({ body: { msg } }) => {
+									expect(msg).to.equal('Bad Request');
+								});
+						});
+						it('status:404, valid but non existent id responds with bad request', () => {
+							return request
+								.patch('/api/comments/1233456')
+								.expect(404)
+								.send({ inc_votes: 10 })
+								.then(({ body: { msg } }) => {
+									expect(msg).to.equal('Not Found');
+								});
+						});
+						it('status:400, passing wrong vote data type', () => {
+							return request
+								.patch('/api/comments/one')
+								.send({ inc_votes: 'ten' })
+								.expect(400)
+								.then(({ body: { msg } }) => {
+									expect(msg).to.equal('Bad Request');
+								});
+						});
+						it('status:400, wrong key value in send data', () => {
+							return request
+								.patch('/api/comments/one')
+								.send({ elephants: 10 })
+								.expect(400)
+								.then(({ body: { msg } }) => {
+									expect(msg).to.equal('Bad Request');
+								});
+						});
+					});
+					describe('DELETE', () => {
+						it('status:204, returns no content', () => {
+							return request.delete('/api/comments/1').expect(204);
+						});
+						it('status:400, bad comment id type', () => {
+							return request
+								.delete('/api/comments/one')
+								.expect(400)
+								.then(({ body: { msg } }) => {
+									expect(msg).to.equal('Bad Request');
+								});
+						});
+						it('status:404, valid but non existent comment id', () => {
+							return request
+								.delete('/api/comments/99999')
+								.expect(404)
+								.then(({ body: { msg } }) => {
+									expect(msg).to.equal('Not Found');
+								});
+						});
+					});
+					describe('INVALID METHODS', () => {
+						it('status: 405, reponds with method not allowed', () => {
+							const methodArr = ['post', 'put', 'get'];
+							const promiseArr = methodArr.map(method => {
+								return request[method]('/api/comments/1')
+									.expect(405)
+									.then(({ body: { msg } }) => {
+										expect(msg).to.equal('Method not allowed');
+									});
+							});
+							return Promise.all[promiseArr];
+						});
+					});
+				});
+			});
 			describe('/topics', () => {
 				describe('GET', () => {
 					it('status:200, responds with an object with key topics and value of array of topics', () => {
@@ -141,8 +237,65 @@ describe('app', () => {
 									'votes',
 									'topic',
 									'author',
-									'created_at'
+									'created_at',
+									'comment_count'
 								);
+							});
+					});
+					it('status:200, default sort of date, descending', () => {
+						return request
+							.get('/api/articles')
+							.expect(200)
+							.then(({ body: { articles } }) => {
+								expect(articles).to.be.descendingBy('created_at');
+							});
+					});
+					it('status:200, sort by query', () => {
+						return request
+							.get('/api/articles?sort_by=votes')
+							.expect(200)
+							.then(({ body: { articles } }) => {
+								expect(articles).to.be.descendingBy('votes');
+							});
+					});
+					it('status:200, order by query, defaulting to desc', () => {
+						return request
+							.get('/api/articles?order=desc')
+							.expect(200)
+							.then(({ body: { articles } }) => {
+								expect(articles).to.be.descendingBy('created_at');
+							});
+					});
+					it('status:200, allows query of author and returns articles by that author', () => {
+						return request
+							.get('/api/articles?author=icellusedkars')
+							.expect(200)
+							.then(({ body: { articles } }) => {
+								expect(articles).to.have.length(6);
+							});
+					});
+					it('status:200, allows query of topic and returns articles on that topic', () => {
+						return request
+							.get('/api/articles?topic=mitch')
+							.expect(200)
+							.then(({ body: { articles } }) => {
+								expect(articles).to.have.length(11);
+							});
+					});
+					it('status:404, invalid author query', () => {
+						return request
+							.get('/api/articles?author=iellusedkars')
+							.expect(404)
+							.then(({ body: { msg } }) => {
+								expect(msg).to.equal('Not Found');
+							});
+					});
+					it('status:404, invalid topic query', () => {
+						return request
+							.get('/api/articles?topic=bitch')
+							.expect(404)
+							.then(({ body: { msg } }) => {
+								expect(msg).to.equal('Not Found');
 							});
 					});
 				});
@@ -180,7 +333,7 @@ describe('app', () => {
 						});
 						it('status:404, responds with Article does not exist', () => {
 							return request
-								.get('/api/articles/3')
+								.get('/api/articles/39786')
 								.expect(404)
 								.then(({ body: { msg } }) => {
 									expect(msg).to.equal('Article does not exist');
@@ -250,10 +403,11 @@ describe('app', () => {
 						});
 						it('status:404, responds with article does not exist on incorrect article id', () => {
 							return request
-								.get('/api/articles/2543')
+								.patch('/api/articles/2543')
+								.send({ inc_votes: 10 })
 								.expect(404)
 								.then(({ body: { msg } }) => {
-									expect(msg).to.equal('Article does not exist');
+									expect(msg).to.equal('Not Found');
 								});
 						});
 					});
@@ -286,7 +440,62 @@ describe('app', () => {
 											'body',
 											'created_at'
 										);
-										console.log('WRITE MORE TESTS HERE!!!!!');
+									});
+							});
+							it('status:400, invalid article id', () => {
+								return request
+									.get('/api/articles/steve/comments')
+									.expect(400)
+									.then(({ body: { msg } }) => {
+										expect(msg).to.equal('Bad Request');
+									});
+							});
+							it('status:404, article does not exist', () => {
+								return request
+									.get('/api/articles/23132/comments')
+									.expect(404)
+									.then(({ body: { msg } }) => {
+										expect(msg).to.equal('Article does not exist');
+									});
+							});
+							it('status:200, default sort to created at', () => {
+								return request
+									.get('/api/articles/1/comments')
+									.expect(200)
+									.then(({ body: { comments } }) => {
+										expect(comments).to.be.sortedBy('created_at');
+									});
+							});
+							it('status:200, sorts by query', () => {
+								return request
+									.get('/api/articles/1/comments?sort_by=votes')
+									.expect(200)
+									.then(({ body: { comments } }) => {
+										expect(comments).to.be.sortedBy('votes');
+									});
+							});
+							it('status:400, bad sort query: IS THIS NEEDED???', () => {
+								// return request
+								// 	.get('/api/articles/1/comments?sort_by=botes')
+								// 	.expect(400)
+								// 	.then(({ body: { msg } }) => {
+								// 		expect(msg).to.equal('Bad Request');
+								// 	});
+							});
+							it('status:200, default order of desc', () => {
+								return request
+									.get('/api/articles/1/comments?order=desc')
+									.expect(200)
+									.then(({ body: { comments } }) => {
+										expect(comments).to.be.descendingBy('created_at');
+									});
+							});
+							it('status:200, order by query', () => {
+								return request
+									.get('/api/articles/1/comments?order=asc')
+									.expect(200)
+									.then(({ body: { comments } }) => {
+										expect(comments).to.be.ascendingBy('created_at');
 									});
 							});
 						});

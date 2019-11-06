@@ -1,14 +1,33 @@
 const connection = require('../db/connection');
 const { fetchUserById } = require('../models/users-model');
 
-exports.fetchAllArticles = () => {
-	return connection('articles').select('*');
+exports.fetchAllArticles = (
+	sort_by = 'created_at',
+	order = 'desc',
+	author,
+	topic
+) => {
+	return connection('articles')
+		.leftJoin('comments', 'articles.article_id', 'comments.article_id')
+		.select('articles.*')
+		.count('comment_id as comment_count')
+		.modify(query => {
+			if (author) query.where('articles.author', author);
+			if (topic) query.where({ topic });
+		})
+		.groupBy('articles.article_id')
+		.orderBy(sort_by, order)
+		.then(articles => {
+			return articles.length === 0
+				? Promise.reject({ status: 404, msg: 'Not Found' })
+				: articles;
+		});
 };
 
 exports.fetchArticleById = article_id => {
 	return connection('articles')
 		.where('articles.article_id', article_id)
-		.join('comments', 'articles.article_id', 'comments.article_id')
+		.leftJoin('comments', 'articles.article_id', 'comments.article_id')
 		.select(
 			'articles.article_id',
 			'articles.title',
@@ -46,7 +65,11 @@ exports.sendComment = (body, author, article_id) => {
 	});
 };
 
-exports.fetchAllCommentsByArticleId = article_id => {
+exports.fetchAllCommentsByArticleId = (
+	article_id,
+	sort_by = 'created_at',
+	order = 'asc'
+) => {
 	return connection('comments')
 		.select(
 			'comments.comment_id',
@@ -55,6 +78,7 @@ exports.fetchAllCommentsByArticleId = article_id => {
 			'comments.author',
 			'comments.body'
 		)
+		.orderBy(sort_by, order)
 		.where('articles.article_id', article_id)
 		.join('articles', 'articles.author', 'comments.author');
 };
