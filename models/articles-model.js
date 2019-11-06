@@ -49,7 +49,9 @@ exports.fetchArticleById = article_id => {
 exports.updateVotes = (article_id, newVotes) => {
 	return connection('articles')
 		.where('article_id', article_id)
-		.increment('votes', newVotes)
+		.modify(query => {
+			if (newVotes) query.increment('votes', newVotes);
+		})
 		.returning('*');
 };
 

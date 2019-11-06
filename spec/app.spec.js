@@ -30,9 +30,9 @@ describe('app', () => {
 		});
 		describe('/api', () => {
 			describe('/comments', () => {
-				describe.only('/:commentId', () => {
+				describe('/:commentId', () => {
 					describe('PATCH', () => {
-						it('status:200, updates comment and returns updated comment', () => {
+						it('status:200, works with negative numbers', () => {
 							return request
 								.patch('/api/comments/1')
 								.send({ inc_votes: 10 })
@@ -43,6 +43,23 @@ describe('app', () => {
 										author: 'butter_bridge',
 										article_id: 9,
 										votes: 26,
+										created_at: '2017-11-22T12:36:03.389Z',
+										body:
+											"Oh, I've got compassion running out of my nose, pal! I'm the Sultan of Sentiment!"
+									});
+								});
+						});
+						it('status:200, updates comment and returns updated comment', () => {
+							return request
+								.patch('/api/comments/1')
+								.send({ inc_votes: -10 })
+								.expect(200)
+								.then(({ body: { updatedComment } }) => {
+									expect(updatedComment).to.eql({
+										comment_id: 1,
+										author: 'butter_bridge',
+										article_id: 9,
+										votes: 6,
 										created_at: '2017-11-22T12:36:03.389Z',
 										body:
 											"Oh, I've got compassion running out of my nose, pal! I'm the Sultan of Sentiment!"
@@ -201,6 +218,14 @@ describe('app', () => {
 						it('status:404, responds with User does not exist', () => {
 							return request
 								.get('/api/users/stevey')
+								.expect(404)
+								.then(({ body: { msg } }) => {
+									expect(msg).to.equal('Not Found');
+								});
+						});
+						it('status:404, invalid username data type', () => {
+							return request
+								.get('/api/users/11223')
 								.expect(404)
 								.then(({ body: { msg } }) => {
 									expect(msg).to.equal('Not Found');
