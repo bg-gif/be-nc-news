@@ -84,3 +84,12 @@ exports.fetchAllCommentsByArticleId = (
 		.where('articles.article_id', article_id)
 		.orderBy(sort_by, order);
 };
+
+exports.checkArticleId = article_id => {
+	return connection('articles')
+		.select('*')
+		.where({ article_id })
+		.then(([article]) => {
+			if (!article) return Promise.reject({ status: 404, msg: 'Not Found' });
+		});
+};

@@ -3,7 +3,8 @@ const {
 	fetchArticleById,
 	updateVotes,
 	sendComment,
-	fetchAllCommentsByArticleId
+	fetchAllCommentsByArticleId,
+	checkArticleId
 } = require('../models/articles-model');
 
 exports.getAllArticles = (req, res, next) => {
@@ -27,11 +28,12 @@ exports.getArticleById = (req, res, next) => {
 exports.patchVotes = (req, res, next) => {
 	const { article_id } = req.params;
 	const { inc_votes } = req.body;
-	updateVotes(article_id, inc_votes)
-		.then(([updatedArticle]) => {
-			return updatedArticle === undefined
-				? Promise.reject({ status: 404, msg: 'Not Found' })
-				: res.status(200).send({ updatedArticle });
+	return Promise.all([
+		checkArticleId(article_id),
+		updateVotes(article_id, inc_votes)
+	])
+		.then(([check, [updatedArticle]]) => {
+			res.status(200).send({ updatedArticle });
 		})
 		.catch(next);
 };
@@ -39,8 +41,11 @@ exports.patchVotes = (req, res, next) => {
 exports.postComment = (req, res, next) => {
 	const { body, username } = req.body;
 	const { article_id } = req.params;
-	sendComment(body, username, article_id)
-		.then(([postedComment]) => {
+	return Promise.all([
+		checkArticleId(article_id),
+		sendComment(body, username, article_id)
+	])
+		.then(([check, [postedComment]]) => {
 			res.status(201).send({ postedComment });
 		})
 		.catch(next);
@@ -49,11 +54,11 @@ exports.postComment = (req, res, next) => {
 exports.getAllCommentsByArticleId = (req, res, next) => {
 	const { article_id } = req.params;
 	const { sort_by, order } = req.query;
-	return fetchArticleById(article_id)
-		.then(() => {
-			return fetchAllCommentsByArticleId(article_id, sort_by, order);
-		})
-		.then(comments => {
+	return Promise.all([
+		checkArticleId(article_id),
+		fetchAllCommentsByArticleId(article_id, sort_by, order)
+	])
+		.then(([check, comments]) => {
 			res.status(200).send({ comments });
 		})
 		.catch(next);

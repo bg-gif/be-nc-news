@@ -29,6 +29,14 @@ describe('app', () => {
 				});
 		});
 		describe('/api', () => {
+			it('status: 200, returns a JSON object with all available endpoints', () => {
+				return request
+					.get('/api/')
+					.expect(200)
+					.then(({ body }) => {
+						expect(body).to.be.an('object');
+					});
+			});
 			describe('/comments', () => {
 				describe('/:commentId', () => {
 					describe('PATCH', () => {
@@ -488,7 +496,7 @@ describe('app', () => {
 									.get('/api/articles/23132/comments')
 									.expect(404)
 									.then(({ body: { msg } }) => {
-										expect(msg).to.equal('Article does not exist');
+										expect(msg).to.equal('Not Found');
 									});
 							});
 							it('status:200, default sort to created at', () => {

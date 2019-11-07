@@ -12,9 +12,9 @@ const {
 app.use(express.json());
 app.use('/api', apiRouter);
 app.use('/*', handle404s);
-app.use(handleCustoms);
 app.use(handle400s);
 app.use(handle422s);
+app.use(handleCustoms);
 app.use(handle500s);
 
 module.exports = app;
