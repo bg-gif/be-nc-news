@@ -14,3 +14,16 @@ exports.fetchUserById = (username = 'placeholder') => {
 				: response;
 		});
 };
+
+exports.checkUser = username => {
+	if (!username) {
+		return Promise.reject({ status: 400, msg: 'User Not Found' });
+	}
+	return connection('users')
+		.where({ username })
+		.then(([user]) => {
+			if (!user) {
+				return Promise.reject({ status: 400, msg: 'User Not Found' });
+			}
+		});
+};

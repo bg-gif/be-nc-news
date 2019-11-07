@@ -8,11 +8,11 @@ exports.patchCommentById = (req, res, next) => {
 	const { comment_id } = req.params;
 	const { inc_votes } = req.body;
 	return Promise.all([
-		checkCommentId(comment_id),
-		updateCommentById(comment_id, inc_votes)
+		updateCommentById(comment_id, inc_votes),
+		checkCommentId(comment_id)
 	])
-		.then(([check, [updatedComment]]) => {
-			res.status(200).send({ updatedComment });
+		.then(([[comment]]) => {
+			res.status(200).send({ comment });
 		})
 		.catch(next);
 };

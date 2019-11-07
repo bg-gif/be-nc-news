@@ -1,5 +1,5 @@
 const connection = require('../db/connection');
-const { fetchUserById } = require('../models/users-model');
+const { checkUser } = require('../models/users-model');
 
 exports.fetchAllArticles = (
 	sort_by = 'created_at',
@@ -14,17 +14,15 @@ exports.fetchAllArticles = (
 		.leftJoin('comments', 'articles.article_id', 'comments.article_id')
 		.select('articles.*')
 		.count('comment_id as comment_count')
+		.groupBy('articles.article_id')
 		.modify(query => {
 			if (author) query.where('articles.author', author);
 			if (topic) query.where({ topic });
 			if (limit) query.limit(limit).offset(offset);
 		})
-		.groupBy('articles.article_id')
 		.orderBy(sort_by, order)
 		.then(articles => {
-			return articles.length === 0
-				? Promise.reject({ status: 404, msg: 'Not Found' })
-				: articles;
+			return articles;
 		});
 };
 
@@ -45,7 +43,7 @@ exports.fetchArticleById = article_id => {
 		.groupBy('articles.article_id')
 		.then(([article]) => {
 			return article === undefined
-				? Promise.reject({ status: 404, msg: 'Article does not exist' })
+				? Promise.reject({ status: 404, msg: 'Not Found' })
 				: article;
 		});
 };
@@ -61,7 +59,7 @@ exports.updateVotes = (article_id, newVotes) => {
 
 exports.sendComment = (body, author, article_id) => {
 	return Promise.all([
-		fetchUserById(author),
+		checkUser(author),
 		this.fetchArticleById(article_id)
 	]).then(() => {
 		const comment = { body, article_id, author };
@@ -90,16 +88,14 @@ exports.fetchAllCommentsByArticleId = (
 		.modify(query => {
 			if (limit) query.limit(limit).offset(offset);
 		})
-		.leftJoin('articles', 'articles.author', 'comments.author')
-		.where('articles.article_id', article_id)
+		.where({ article_id })
 		.orderBy(sort_by, order);
 };
-
-exports.checkArticleId = article_id => {
-	return connection('articles')
+exports.fetchArticleByTopic = slug => {
+	return connection('topics')
 		.select('*')
-		.where({ article_id })
-		.then(([article]) => {
-			if (!article) return Promise.reject({ status: 404, msg: 'Not Found' });
+		.where({ slug })
+		.then(([topic]) => {
+			if (!topic) return Promise.reject({ status: 404, msg: 'Not Found' });
 		});
 };

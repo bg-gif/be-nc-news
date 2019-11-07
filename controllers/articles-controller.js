@@ -4,16 +4,37 @@ const {
 	updateVotes,
 	sendComment,
 	fetchAllCommentsByArticleId,
-	checkArticleId
+	fetchArticleByTopic
 } = require('../models/articles-model');
+const { checkUser } = require('../models/users-model');
 
 exports.getAllArticles = (req, res, next) => {
 	const { sort_by, order, author, topic, limit, p } = req.query;
-	fetchAllArticles(sort_by, order, author, topic, limit, p)
-		.then(articles => {
-			res.status(200).send({ articles });
-		})
-		.catch(next);
+	if (author) {
+		return Promise.all([
+			fetchAllArticles(sort_by, order, author, topic, limit, p),
+			checkUser(author)
+		])
+			.then(([articles]) => {
+				res.status(200).send({ articles });
+			})
+			.catch(next);
+	} else if (topic) {
+		return Promise.all([
+			fetchAllArticles(sort_by, order, author, topic, limit, p),
+			fetchArticleByTopic(topic)
+		])
+			.then(([articles]) => {
+				res.status(200).send({ articles });
+			})
+			.catch(next);
+	} else {
+		return fetchAllArticles(sort_by, order, author, topic, limit, p)
+			.then(articles => {
+				res.status(200).send({ articles });
+			})
+			.catch(next);
+	}
 };
 
 exports.getArticleById = (req, res, next) => {
@@ -29,11 +50,11 @@ exports.patchVotes = (req, res, next) => {
 	const { article_id } = req.params;
 	const { inc_votes } = req.body;
 	return Promise.all([
-		checkArticleId(article_id),
-		updateVotes(article_id, inc_votes)
+		updateVotes(article_id, inc_votes),
+		fetchArticleById(article_id)
 	])
-		.then(([check, [updatedArticle]]) => {
-			res.status(200).send({ updatedArticle });
+		.then(([[article]]) => {
+			res.status(200).send({ article });
 		})
 		.catch(next);
 };
@@ -41,12 +62,14 @@ exports.patchVotes = (req, res, next) => {
 exports.postComment = (req, res, next) => {
 	const { body, username } = req.body;
 	const { article_id } = req.params;
+
 	return Promise.all([
-		checkArticleId(article_id),
-		sendComment(body, username, article_id)
+		sendComment(body, username, article_id),
+		fetchArticleById(article_id),
+		checkUser(username)
 	])
-		.then(([check, [postedComment]]) => {
-			res.status(201).send({ postedComment });
+		.then(([[comment]]) => {
+			res.status(201).send({ comment });
 		})
 		.catch(next);
 };
@@ -55,10 +78,10 @@ exports.getAllCommentsByArticleId = (req, res, next) => {
 	const { article_id } = req.params;
 	const { sort_by, order, limit, p } = req.query;
 	return Promise.all([
-		checkArticleId(article_id),
-		fetchAllCommentsByArticleId(article_id, sort_by, order, limit, p)
+		fetchAllCommentsByArticleId(article_id, sort_by, order, limit, p),
+		fetchArticleById(article_id)
 	])
-		.then(([check, comments]) => {
+		.then(([comments]) => {
 			res.status(200).send({ comments });
 		})
 		.catch(next);

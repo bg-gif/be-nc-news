@@ -1,60 +1,43 @@
 # Northcoders News API
 
-**You can clone this repository but do not fork it**
+**A Northcoders branded reddit clone**
 
-## Background
+## Prerequisites
 
-We will be building the API to use in the Northcoders News Sprint during the Front End block of the course.
+To run the news api, you will need **express, pg and knex.**
 
-Your database will be PSQL, and you will interact with it using [Knex](https://knexjs.org).
-
-## Step 1 - Setting up your own repository
-
-Clone this repo:
+To install all the dependencies:
 
 ```bash
-git clone https://github.com/northcoders/be-nc-news
-
-cd be-nc-news
+npm i
 ```
 
-On GitHub create your own **public** repository for your project. **Make sure NOT to initialise it with a README or .gitignore.**
+## Installing Dev Dependencies
 
-Next, you should hook your local version up to the newly created GitHub repo. Use the following terminal commands, making sure to check the git remotes with each step (`git remote -v`):
+To run the dev server, you will need **chai, mocha, supertest, and chai-sorted**
+
+These should have been installed when running the previous install but just in case:
 
 ```bash
-git remote remove origin
 
-# This will prevent you from pushing to the original Northcoders' repo.
+npm i chai mocha supertest chai-sorted -D
+
+# This will install all relevant dev dependencies.
 ```
 
-```bash
-git remote add origin <YOUR-GITHUB-URL>
+## Running the tests
 
-# This will add your GitHub location to your local git repository.
-# You can confirm this by checking the new git remote.
-```
+The program comes with many different scripts to make designing and testing easier.
 
-## Step 2 - Setting up your project
+**setup-dbs** - Creates the database for the information to go into.
+**seed** - Seeds the database with tables and appropriate column titles for storing the information.
+**migrate-latest** - Fills the tables with information from the data folder, defaulting to dev data
+**migrate-rollback** - Takes the tables back to their previous form before the last migration.
+**dev** - Sets up the database, tables, and fills tables with dev data and starts the server listening on port 9090.
+**test-utils** - Runs the spec file for the test utilities used to manipulate the data to be able to be parsed into the tables.
+**test** - Runs the spec file for testing the server, responses and methods using supertest
 
-In this repo we have provided you with the knexfile. Make sure to add it to the `.gitignore` once you start pushing to your own repository. If you are on linux insert your postgres username and password into the knexfile.
-
-You have also been provided with a `db` folder with some data, a [setup.sql](./db/setup.sql) file, a `seeds` folder and a `utils` folder. You should also take a minute to familiarise yourself with the npm scripts you have been provided.
-
-Your second task is to make accessing both sets of data around your project easier. You should make 3 `index.js` files: one in `db/data`, and one in each of your data folders (test & development).
-
-The job of `index.js` in each the data folders is to export out all the data from that folder, currently stored in separate files. This is so that, when you need access to the data elsewhere, you can write one convenient require statement - to the index file, rather than having to require each file individually. Make sure the index file exports an object with values of the data from that folder with the keys:
-
-- `topicData`
-- `articleData`
-- `userData`
-- `commentData`
-
-The job of the `db/data/index.js` file will be to export out of the db folder _only the data relevant to the current environment_. Specifically this file should allow your seed file to access only a specific set of data depending on the environment it's in: test, development or production. To do this is will have to require in all the data and should make use of `process.env` in your `index.js` file to achieve only exporting the right data out.
-
-**HINT: make sure the keys you export match up with the keys required into the seed file**
-
-## Step 3 - Migrations and Seeding
+## Test Utils
 
 Your seed file should now be set up to require in either test or dev data depending on the environment.
 
@@ -148,20 +131,20 @@ _**All of your endpoints should send the below responses in an object, with a ke
 
 ```json
 {
-  "topics": [
-    {
-      "description": "Code is love, code is life",
-      "slug": "coding"
-    },
-    {
-      "description": "FOOTIE!",
-      "slug": "football"
-    },
-    {
-      "description": "Hey good looking, what you got cooking?",
-      "slug": "cooking"
-    }
-  ]
+	"topics": [
+		{
+			"description": "Code is love, code is life",
+			"slug": "coding"
+		},
+		{
+			"description": "FOOTIE!",
+			"slug": "football"
+		},
+		{
+			"description": "Hey good looking, what you got cooking?",
+			"slug": "cooking"
+		}
+	]
 }
 ```
 

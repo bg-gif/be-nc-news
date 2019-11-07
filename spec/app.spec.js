@@ -45,8 +45,8 @@ describe('app', () => {
 								.patch('/api/comments/1')
 								.send({ inc_votes: 10 })
 								.expect(200)
-								.then(({ body: { updatedComment } }) => {
-									expect(updatedComment).to.eql({
+								.then(({ body: { comment } }) => {
+									expect(comment).to.eql({
 										comment_id: 1,
 										author: 'butter_bridge',
 										article_id: 9,
@@ -62,8 +62,8 @@ describe('app', () => {
 								.patch('/api/comments/1')
 								.send({ inc_votes: -10 })
 								.expect(200)
-								.then(({ body: { updatedComment } }) => {
-									expect(updatedComment).to.eql({
+								.then(({ body: { comment } }) => {
+									expect(comment).to.eql({
 										comment_id: 1,
 										author: 'butter_bridge',
 										article_id: 9,
@@ -312,7 +312,7 @@ describe('app', () => {
 							.get('/api/articles?author=icellusedkars')
 							.expect(200)
 							.then(({ body: { articles } }) => {
-								expect(articles).to.have.length(6);
+								expect(articles.length).to.equal(6);
 							});
 					});
 					it('status:200, allows query of topic and returns articles on that topic', () => {
@@ -339,12 +339,12 @@ describe('app', () => {
 								expect(articles.length).to.equal(2);
 							});
 					});
-					it('status:404, invalid author query', () => {
+					it('status:400, invalid author query', () => {
 						return request
 							.get('/api/articles?author=iellusedkars')
-							.expect(404)
+							.expect(400)
 							.then(({ body: { msg } }) => {
-								expect(msg).to.equal('Not Found');
+								expect(msg).to.equal('User Not Found');
 							});
 					});
 					it('status:404, invalid topic query', () => {
@@ -353,6 +353,22 @@ describe('app', () => {
 							.expect(404)
 							.then(({ body: { msg } }) => {
 								expect(msg).to.equal('Not Found');
+							});
+					});
+					it('status 200, user exists bus has no articles', () => {
+						return request
+							.get('/api/articles?author=lurker')
+							.expect(200)
+							.then(({ body: { articles } }) => {
+								expect(articles).to.eql([]);
+							});
+					});
+					it('status:200, topic exists but has no articles', () => {
+						return request
+							.get('/api/articles?topic=paper')
+							.expect(200)
+							.then(({ body: { articles } }) => {
+								expect(articles).to.eql([]);
 							});
 					});
 				});
@@ -388,12 +404,12 @@ describe('app', () => {
 									});
 								});
 						});
-						it('status:404, responds with Article does not exist', () => {
+						it('status:404, responds with Not Found', () => {
 							return request
 								.get('/api/articles/39786')
 								.expect(404)
 								.then(({ body: { msg } }) => {
-									expect(msg).to.equal('Article does not exist');
+									expect(msg).to.equal('Not Found');
 								});
 						});
 						it('status:400, responds with bad request on wrong datatype in endpoint value', () => {
@@ -411,8 +427,8 @@ describe('app', () => {
 								.patch('/api/articles/1')
 								.send({ inc_votes: 100 })
 								.expect(200)
-								.then(({ body: { updatedArticle } }) => {
-									expect(updatedArticle).to.eql({
+								.then(({ body: { article } }) => {
+									expect(article).to.eql({
 										article_id: 1,
 										title: 'Living in the shadow of a great man',
 										body: 'I find this existence challenging',
@@ -428,8 +444,8 @@ describe('app', () => {
 								.patch('/api/articles/1')
 								.send({ inc_votes: -100 })
 								.expect(200)
-								.then(({ body: { updatedArticle } }) => {
-									expect(updatedArticle).to.eql({
+								.then(({ body: { article } }) => {
+									expect(article).to.eql({
 										article_id: 1,
 										title: 'Living in the shadow of a great man',
 										body: 'I find this existence challenging',
@@ -489,7 +505,7 @@ describe('app', () => {
 									.expect(200)
 									.then(({ body: { comments } }) => {
 										expect(comments).to.be.an('array');
-										expect(comments).to.have.length(5);
+										expect(comments).to.have.length(13);
 										expect(comments[0]).to.include.keys(
 											'author',
 											'votes',
@@ -557,7 +573,7 @@ describe('app', () => {
 							});
 							it('status:200, allows a limit query and limits the number of results shown to that amount', () => {
 								return request
-									.get('/api/articles/2/comments?limit=10')
+									.get('/api/articles/1/comments?limit=10')
 									.expect(200)
 									.then(({ body: { comments } }) => {
 										expect(comments.length).to.equal(10);
@@ -565,10 +581,18 @@ describe('app', () => {
 							});
 							it('status:200, allows a page number query and shows results from that page', () => {
 								return request
-									.get('/api/articles/2/comments?limit=10&p=2')
+									.get('/api/articles/1/comments?limit=10&p=2')
 									.expect(200)
 									.then(({ body: { comments } }) => {
 										expect(comments.length).to.equal(3);
+									});
+							});
+							it('status:200, valid article, no comments', () => {
+								return request
+									.get('/api/articles/2/comments')
+									.expect(200)
+									.then(({ body: { comments } }) => {
+										expect(comments.length).to.equal(0);
 									});
 							});
 						});
@@ -581,8 +605,8 @@ describe('app', () => {
 										body: 'This was proper bad'
 									})
 									.expect(201)
-									.then(({ body: { postedComment } }) => {
-										expect(postedComment).to.include.keys(
+									.then(({ body: { comment } }) => {
+										expect(comment).to.include.keys(
 											'author',
 											'article_id',
 											'votes',
@@ -595,9 +619,9 @@ describe('app', () => {
 								return request
 									.post('/api/articles/1/comments')
 									.send({ body: 'This were not good' })
-									.expect(404)
+									.expect(400)
 									.then(({ body: { msg } }) => {
-										expect(msg).to.equal('Not Found');
+										expect(msg).to.equal('User Not Found');
 									});
 							});
 							it('status:400, invalid article id', () => {
@@ -616,9 +640,9 @@ describe('app', () => {
 								return request
 									.post('/api/articles/1/comments')
 									.send({ body: 'This were not good', username: 123 })
-									.expect(404)
+									.expect(400)
 									.then(({ body: { msg } }) => {
-										expect(msg).to.equal('Not Found');
+										expect(msg).to.equal('User Not Found');
 									});
 							});
 							it('status:400, Missing body on comment', () => {
