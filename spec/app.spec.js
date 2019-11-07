@@ -555,6 +555,22 @@ describe('app', () => {
 										expect(comments).to.be.ascendingBy('created_at');
 									});
 							});
+							it('status:200, allows a limit query and limits the number of results shown to that amount', () => {
+								return request
+									.get('/api/articles/2/comments?limit=10')
+									.expect(200)
+									.then(({ body: { comments } }) => {
+										expect(comments.length).to.equal(10);
+									});
+							});
+							it('status:200, allows a page number query and shows results from that page', () => {
+								return request
+									.get('/api/articles/2/comments?limit=10&p=2')
+									.expect(200)
+									.then(({ body: { comments } }) => {
+										expect(comments.length).to.equal(3);
+									});
+							});
 						});
 						describe('POST', () => {
 							it('status:201, responds with posted comment', () => {

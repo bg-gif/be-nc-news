@@ -74,8 +74,11 @@ exports.sendComment = (body, author, article_id) => {
 exports.fetchAllCommentsByArticleId = (
 	article_id,
 	sort_by = 'created_at',
-	order = 'asc'
+	order = 'asc',
+	limit,
+	offset = 0
 ) => {
+	if (offset > 0) offset = offset * limit - limit;
 	return connection('comments')
 		.select(
 			'comments.comment_id',
@@ -84,6 +87,9 @@ exports.fetchAllCommentsByArticleId = (
 			'comments.author',
 			'comments.body'
 		)
+		.modify(query => {
+			if (limit) query.limit(limit).offset(offset);
+		})
 		.leftJoin('articles', 'articles.author', 'comments.author')
 		.where('articles.article_id', article_id)
 		.orderBy(sort_by, order);

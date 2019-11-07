@@ -53,10 +53,10 @@ exports.postComment = (req, res, next) => {
 
 exports.getAllCommentsByArticleId = (req, res, next) => {
 	const { article_id } = req.params;
-	const { sort_by, order } = req.query;
+	const { sort_by, order, limit, p } = req.query;
 	return Promise.all([
 		checkArticleId(article_id),
-		fetchAllCommentsByArticleId(article_id, sort_by, order)
+		fetchAllCommentsByArticleId(article_id, sort_by, order, limit, p)
 	])
 		.then(([check, comments]) => {
 			res.status(200).send({ comments });
