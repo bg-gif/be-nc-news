@@ -372,6 +372,71 @@ describe('app', () => {
 							});
 					});
 				});
+				describe.only('POST', () => {
+					it('status 201: responds with posted article', () => {
+						return request
+							.post('/api/articles')
+							.send({
+								title: 'a title',
+								topic: 'mitch',
+								author: 'icellusedkars',
+								body: 'a body'
+							})
+							.expect(201)
+							.then(({ body: { article } }) => {
+								expect(article).to.have.keys(
+									'topic',
+									'title',
+									'author',
+									'article_id',
+									'created_at',
+									'body',
+									'votes'
+								);
+							});
+					});
+					it('status:404, missing username', () => {
+						return request
+							.post('/api/articles')
+							.send({
+								title: 'a title',
+								topic: 'mitch',
+								body: 'a body'
+							})
+							.expect(400)
+							.then(({ body: { msg } }) => {
+								expect(msg).to.equal('User Not Found');
+							});
+					});
+					it('status:404, Invalid username on body', () => {
+						return request
+							.post('/api/articles')
+							.send({
+								title: 'a title',
+								topic: 'mitch',
+								body: 'a body',
+								author: 'notarealusername'
+							})
+							.expect(400)
+							.then(({ body: { msg } }) => {
+								expect(msg).to.equal('User Not Found');
+							});
+					});
+					it('status:404, Invalid topic on body', () => {
+						return request
+							.post('/api/articles')
+							.send({
+								title: 'a title',
+								topic: 'itch',
+								body: 'a body',
+								author: 'icellusedkars'
+							})
+							.expect(400)
+							.then(({ body: { msg } }) => {
+								expect(msg).to.equal('Bad Request');
+							});
+					});
+				});
 				describe('INVALID METHODS', () => {
 					it('status: 405, reponds with method not allowed', () => {
 						const methodArr = ['post', 'put', 'patch', 'delete'];

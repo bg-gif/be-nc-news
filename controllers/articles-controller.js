@@ -4,7 +4,8 @@ const {
 	updateVotes,
 	sendComment,
 	fetchAllCommentsByArticleId,
-	fetchArticleByTopic
+	fetchArticleByTopic,
+	sendArticle
 } = require('../models/articles-model');
 const { checkUser } = require('../models/users-model');
 
@@ -83,6 +84,14 @@ exports.getAllCommentsByArticleId = (req, res, next) => {
 	])
 		.then(([comments]) => {
 			res.status(200).send({ comments });
+		})
+		.catch(next);
+};
+exports.postArticle = (req, res, next) => {
+	const { topic, title, author, body } = req.body;
+	sendArticle(topic, title, author, body)
+		.then(([article]) => {
+			res.status(201).send({ article });
 		})
 		.catch(next);
 };
