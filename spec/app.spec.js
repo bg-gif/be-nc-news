@@ -323,6 +323,22 @@ describe('app', () => {
 								expect(articles).to.have.length(11);
 							});
 					});
+					it('status:200, allows a limit query and limits the number of results shown to that amount', () => {
+						return request
+							.get('/api/articles?limit=10')
+							.expect(200)
+							.then(({ body: { articles } }) => {
+								expect(articles.length).to.equal(10);
+							});
+					});
+					it('status:200, allows a page number query and shows results from that page', () => {
+						return request
+							.get('/api/articles?limit=10&p=2')
+							.expect(200)
+							.then(({ body: { articles } }) => {
+								expect(articles.length).to.equal(2);
+							});
+					});
 					it('status:404, invalid author query', () => {
 						return request
 							.get('/api/articles?author=iellusedkars')

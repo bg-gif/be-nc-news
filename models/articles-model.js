@@ -5,8 +5,11 @@ exports.fetchAllArticles = (
 	sort_by = 'created_at',
 	order = 'desc',
 	author,
-	topic
+	topic,
+	limit,
+	offset = 0
 ) => {
+	if (offset > 0) offset = offset * limit - limit;
 	return connection('articles')
 		.leftJoin('comments', 'articles.article_id', 'comments.article_id')
 		.select('articles.*')
@@ -14,6 +17,7 @@ exports.fetchAllArticles = (
 		.modify(query => {
 			if (author) query.where('articles.author', author);
 			if (topic) query.where({ topic });
+			if (limit) query.limit(limit).offset(offset);
 		})
 		.groupBy('articles.article_id')
 		.orderBy(sort_by, order)
