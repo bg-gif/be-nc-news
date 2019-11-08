@@ -1,5 +1,6 @@
 const connection = require('../db/connection');
 const { checkUser } = require('../models/users-model');
+const { checkTopic } = require('../models/topics-model');
 
 exports.fetchAllArticles = (
 	sort_by = 'created_at',
@@ -78,7 +79,8 @@ exports.sendComment = (body, author, article_id) => {
 exports.fetchAllCommentsByArticleId = (
 	article_id,
 	sort_by = 'created_at',
-	order = 'asc',
+	order = 'desc',
+	author,
 	limit,
 	offset = 0
 ) => {
@@ -99,6 +101,7 @@ exports.fetchAllCommentsByArticleId = (
 		)
 		.modify(query => {
 			if (limit) query.limit(limit).offset(offset);
+			if (author) query.where({ author });
 		})
 		.where({ article_id })
 		.orderBy(sort_by, order);
@@ -110,4 +113,22 @@ exports.fetchArticleByTopic = slug => {
 		.then(([topic]) => {
 			if (!topic) return Promise.reject({ status: 404, msg: 'Not Found' });
 		});
+};
+
+exports.sendArticle = (topic, title, author, body) => {
+	if (!body) return Promise.reject({ status: 404, msg: 'Missing Content' });
+	else {
+		const article = { topic, title, author, body };
+		return Promise.all([checkTopic(topic), checkUser(author)]).then(() => {
+			return connection('articles')
+				.insert(article)
+				.returning('*');
+		});
+	}
+};
+
+exports.removeArticleById = article_id => {
+	return connection('articles')
+		.del()
+		.where({ article_id });
 };

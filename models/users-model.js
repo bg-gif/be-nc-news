@@ -1,7 +1,19 @@
 const connection = require('../db/connection');
 
-exports.fetchAllUsers = () => {
-	return connection('users').select('*');
+exports.fetchAllUsers = name => {
+	return connection('users')
+		.modify(query => {
+			if (name) {
+				query.where({ name });
+			}
+		})
+		.select('*')
+		.returning('*')
+		.then(response => {
+			return response.length === 0
+				? Promise.reject({ status: 404, msg: 'Not Found' })
+				: response;
+		});
 };
 
 exports.fetchUserById = (username = 'placeholder') => {
@@ -17,7 +29,7 @@ exports.fetchUserById = (username = 'placeholder') => {
 
 exports.checkUser = username => {
 	if (!username) {
-		return Promise.reject({ status: 400, msg: 'User Not Found' });
+		return Promise.reject({ status: 404, msg: 'User Not Found' });
 	}
 	return connection('users')
 		.where({ username })
@@ -26,4 +38,10 @@ exports.checkUser = username => {
 				return Promise.reject({ status: 400, msg: 'User Not Found' });
 			}
 		});
+};
+
+exports.sendUser = (username, avatar_url, name) => {
+	return connection('users')
+		.insert({ username, avatar_url, name })
+		.returning('*');
 };

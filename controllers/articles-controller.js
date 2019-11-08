@@ -4,7 +4,9 @@ const {
 	updateVotes,
 	sendComment,
 	fetchAllCommentsByArticleId,
-	fetchArticleByTopic
+	fetchArticleByTopic,
+	sendArticle,
+	removeArticleById
 } = require('../models/articles-model');
 const { checkUser } = require('../models/users-model');
 
@@ -76,13 +78,32 @@ exports.postComment = (req, res, next) => {
 
 exports.getAllCommentsByArticleId = (req, res, next) => {
 	const { article_id } = req.params;
-	const { sort_by, order, limit, p } = req.query;
+	const { author, sort_by, order, limit, p } = req.query;
 	return Promise.all([
-		fetchAllCommentsByArticleId(article_id, sort_by, order, limit, p),
+		fetchAllCommentsByArticleId(article_id, sort_by, order, author, limit, p),
 		fetchArticleById(article_id)
 	])
 		.then(([comments]) => {
 			res.status(200).send({ comments });
+		})
+		.catch(next);
+};
+exports.postArticle = (req, res, next) => {
+	const { topic, title, author, body } = req.body;
+	sendArticle(topic, title, author, body)
+		.then(([article]) => {
+			res.status(201).send({ article });
+		})
+		.catch(next);
+};
+
+exports.deleteArticleById = (req, res, next) => {
+	const { article_id } = req.params;
+	return Promise.all([
+		(removeArticleById(article_id), fetchArticleById(article_id))
+	])
+		.then(() => {
+			res.status(204).send();
 		})
 		.catch(next);
 };
