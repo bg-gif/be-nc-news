@@ -5,7 +5,8 @@ const {
 } = require('../models/users-model');
 
 exports.getAllUsers = (req, res, next) => {
-	fetchAllUsers()
+	const { name } = req.query;
+	fetchAllUsers(name)
 		.then(users => {
 			res.status(200).send({ users });
 		})

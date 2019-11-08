@@ -1,7 +1,19 @@
 const connection = require('../db/connection');
 
-exports.fetchAllUsers = () => {
-	return connection('users').select('*');
+exports.fetchAllUsers = name => {
+	return connection('users')
+		.modify(query => {
+			if (name) {
+				query.where({ name });
+			}
+		})
+		.select('*')
+		.returning('*')
+		.then(response => {
+			return response.length === 0
+				? Promise.reject({ status: 404, msg: 'Not Found' })
+				: response;
+		});
 };
 
 exports.fetchUserById = (username = 'placeholder') => {

@@ -74,6 +74,7 @@ exports.fetchAllCommentsByArticleId = (
 	article_id,
 	sort_by = 'created_at',
 	order = 'desc',
+	author,
 	limit,
 	offset = 0
 ) => {
@@ -88,6 +89,7 @@ exports.fetchAllCommentsByArticleId = (
 		)
 		.modify(query => {
 			if (limit) query.limit(limit).offset(offset);
+			if (author) query.where({ author });
 		})
 		.where({ article_id })
 		.orderBy(sort_by, order);

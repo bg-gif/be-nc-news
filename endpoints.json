@@ -29,7 +29,7 @@
 	},
 	"GET /api/users": {
 		"description": "returns an array of all users on the db on an object with key users",
-		"queries": [],
+		"queries": ["name"],
 		"exampleResponse": {
 			"user": {
 				"users": [
@@ -81,7 +81,7 @@
 	},
 	"GET /api/articles/:article_id/comments": {
 		"description": "serves all comments about article specified by article id",
-		"queries": ["sort_by", "order"],
+		"queries": ["author", "sort_by", "order"],
 		"exampleResponse": {
 			"comments": [
 				{

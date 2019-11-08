@@ -228,6 +228,27 @@ describe('app', () => {
 								expect(users.length).to.equal(4);
 							});
 					});
+					it('status:200, allows query of name', () => {
+						return request
+							.get('/api/users?name=sam')
+							.expect(200)
+							.then(({ body: { users } }) => {
+								expect(users[0]).to.eql({
+									username: 'icellusedkars',
+									name: 'sam',
+									avatar_url:
+										'https://avatars2.githubusercontent.com/u/24604688?s=460&v=4'
+								});
+							});
+					});
+					it('status:404, invalid name query', () => {
+						return request
+							.get('/api/users?name=slam')
+							.expect(404)
+							.then(({ body: { msg } }) => {
+								expect(msg).to.equal('Not Found');
+							});
+					});
 				});
 				describe('POST', () => {
 					it('status:201, responds with posted user', () => {
@@ -741,6 +762,14 @@ describe('app', () => {
 									.expect(200)
 									.then(({ body: { comments } }) => {
 										expect(comments).to.be.descendingBy('created_at');
+									});
+							});
+							it('status:200, allows query of author and returns all comments by that author', () => {
+								return request
+									.get('/api/articles/1/comments?author=icellusedkars')
+									.expect(200)
+									.then(({ body: { comments } }) => {
+										expect(comments.length).to.equal(11);
 									});
 							});
 							it('status:200, sorts by query', () => {
