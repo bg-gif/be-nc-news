@@ -5,7 +5,8 @@ const {
 	sendComment,
 	fetchAllCommentsByArticleId,
 	fetchArticleByTopic,
-	sendArticle
+	sendArticle,
+	removeArticleById
 } = require('../models/articles-model');
 const { checkUser } = require('../models/users-model');
 
@@ -92,6 +93,17 @@ exports.postArticle = (req, res, next) => {
 	sendArticle(topic, title, author, body)
 		.then(([article]) => {
 			res.status(201).send({ article });
+		})
+		.catch(next);
+};
+
+exports.deleteArticleById = (req, res, next) => {
+	const { article_id } = req.params;
+	return Promise.all([
+		(removeArticleById(article_id), fetchArticleById(article_id))
+	])
+		.then(() => {
+			res.status(204).send();
 		})
 		.catch(next);
 };

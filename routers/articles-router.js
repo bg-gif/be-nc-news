@@ -5,7 +5,8 @@ const {
 	patchVotes,
 	postComment,
 	getAllCommentsByArticleId,
-	postArticle
+	postArticle,
+	deleteArticleById
 } = require('../controllers/articles-controller.js');
 const { handle405s } = require('../errors');
 
@@ -18,6 +19,7 @@ articlesRouter
 articlesRouter
 	.route('/:article_id')
 	.get(getArticleById)
+	.delete(deleteArticleById)
 	.patch(patchVotes)
 	.all(handle405s);
 

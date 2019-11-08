@@ -29,13 +29,15 @@ describe('app', () => {
 				});
 		});
 		describe('/api', () => {
-			it('status: 200, returns a JSON object with all available endpoints', () => {
-				return request
-					.get('/api/')
-					.expect(200)
-					.then(({ body }) => {
-						expect(body).to.be.an('object');
-					});
+			describe('GET', () => {
+				it('status: 200, returns a JSON object with all available endpoints', () => {
+					return request
+						.get('/api/')
+						.expect(200)
+						.then(({ body }) => {
+							expect(body).to.be.an('object');
+						});
+				});
 			});
 			describe('/comments', () => {
 				describe('/:commentId', () => {
@@ -159,9 +161,46 @@ describe('app', () => {
 							});
 					});
 				});
+				describe('POST', () => {
+					it('status:201, responds with posted topic', () => {
+						return request
+							.post('/api/topics')
+							.send({
+								slug: 'internet',
+								description: 'How the internet was a mistake'
+							})
+							.expect(201)
+							.then(({ body: { topic } }) => {
+								expect(topic).to.have.keys('slug', 'description');
+								expect(topic).to.be.an('object');
+							});
+					});
+					it('status: 400 Missing slug on body', () => {
+						return request
+							.post('/api/topics')
+							.send({
+								description: 'How the internet was a mistake'
+							})
+							.expect(400)
+							.then(({ body: { msg } }) => {
+								expect(msg).to.equal('Bad Request');
+							});
+					});
+					it('status: 400 Missing description on body', () => {
+						return request
+							.post('/api/topics')
+							.send({
+								slug: 'internet'
+							})
+							.expect(400)
+							.then(({ body: { msg } }) => {
+								expect(msg).to.equal('Bad Request');
+							});
+					});
+				});
 				describe('INVALID METHODS', () => {
 					it('status: 405, reponds with method not allowed', () => {
-						const methodArr = ['post', 'put', 'patch', 'delete'];
+						const methodArr = ['put', 'patch', 'delete'];
 						const promiseArr = methodArr.map(method => {
 							return request[method]('/api/topics')
 								.expect(405)
@@ -186,12 +225,65 @@ describe('app', () => {
 									'avatar_url',
 									'name'
 								);
+								expect(users.length).to.equal(4);
+							});
+					});
+				});
+				describe('POST', () => {
+					it('status:201, responds with posted user', () => {
+						return request
+							.post('/api/users')
+							.send({
+								username: 'slartibartfast',
+								avatar_url: 'https://www.42dontpanic.com/imgurl',
+								name: 'Richard Vernon'
+							})
+							.expect(201)
+							.then(({ body: { user } }) => {
+								expect(user).to.have.keys('username', 'avatar_url', 'name');
+								expect(user).to.be.an('object');
+							});
+					});
+					it('status: 400 Missing username on body', () => {
+						return request
+							.post('/api/users')
+							.send({
+								avatar_url: 'https://www.42dontpanic.com/imgurl',
+								name: 'Richard Vernon'
+							})
+							.expect(400)
+							.then(({ body: { msg } }) => {
+								expect(msg).to.equal('Bad Request');
+							});
+					});
+					it('status: 400 Missing avatar url on body', () => {
+						return request
+							.post('/api/users')
+							.send({
+								username: 'slartibartfast',
+								name: 'Richard Vernon'
+							})
+							.expect(400)
+							.then(({ body: { msg } }) => {
+								expect(msg).to.equal('Bad Request');
+							});
+					});
+					it('status: 400 Missing name on body', () => {
+						return request
+							.post('/api/users')
+							.send({
+								username: 'slartibartfast',
+								avatar_url: 'https://www.42dontpanic.com/imgurl'
+							})
+							.expect(400)
+							.then(({ body: { msg } }) => {
+								expect(msg).to.equal('Bad Request');
 							});
 					});
 				});
 				describe('INVALID METHODS', () => {
 					it('status: 405, reponds with method not allowed', () => {
-						const methodArr = ['post', 'put', 'patch', 'delete'];
+						const methodArr = ['put', 'patch', 'delete'];
 						const promiseArr = methodArr.map(method => {
 							return request[method]('/api/users')
 								.expect(405)
@@ -244,7 +336,7 @@ describe('app', () => {
 						it('status: 405, reponds with method not allowed', () => {
 							const methodArr = ['post', 'put', 'patch', 'delete'];
 							const promiseArr = methodArr.map(method => {
-								return request[method]('/api/users')
+								return request[method]('/api/users/1')
 									.expect(405)
 									.then(({ body: { msg } }) => {
 										expect(msg).to.equal('Method not allowed');
@@ -403,7 +495,7 @@ describe('app', () => {
 								topic: 'mitch',
 								body: 'a body'
 							})
-							.expect(400)
+							.expect(404)
 							.then(({ body: { msg } }) => {
 								expect(msg).to.equal('User Not Found');
 							});
@@ -436,10 +528,36 @@ describe('app', () => {
 								expect(msg).to.equal('Bad Request');
 							});
 					});
+					it('status:404, Missing topic on body', () => {
+						return request
+							.post('/api/articles')
+							.send({
+								title: 'a title',
+								body: 'a body',
+								author: 'icellusedkars'
+							})
+							.expect(400)
+							.then(({ body: { msg } }) => {
+								expect(msg).to.equal('Missing Topic');
+							});
+					});
+					it('status:404, Missing body on article body', () => {
+						return request
+							.post('/api/articles')
+							.send({
+								title: 'a title',
+								topic: 'mitch',
+								author: 'icellusedkars'
+							})
+							.expect(404)
+							.then(({ body: { msg } }) => {
+								expect(msg).to.equal('Missing Content');
+							});
+					});
 				});
 				describe('INVALID METHODS', () => {
 					it('status: 405, reponds with method not allowed', () => {
-						const methodArr = ['post', 'put', 'patch', 'delete'];
+						const methodArr = ['put', 'patch', 'delete'];
 						const promiseArr = methodArr.map(method => {
 							return request[method]('/api/articles')
 								.expect(405)
@@ -549,11 +667,32 @@ describe('app', () => {
 								});
 						});
 					});
+					describe('DELETE', () => {
+						it('status:204, returns no content', () => {
+							return request.delete('/api/articles/1').expect(204);
+						});
+						it('status:400, bad article id type', () => {
+							return request
+								.delete('/api/articles/one')
+								.expect(400)
+								.then(({ body: { msg } }) => {
+									expect(msg).to.equal('Bad Request');
+								});
+						});
+						it('status:404, valid but non existent article id', () => {
+							return request
+								.delete('/api/articles/99999')
+								.expect(404)
+								.then(({ body: { msg } }) => {
+									expect(msg).to.equal('Not Found');
+								});
+						});
+					});
 					describe('INVALID METHODS', () => {
 						it('status: 405, reponds with method not allowed', () => {
-							const methodArr = ['post', 'put', 'delete'];
+							const methodArr = ['post', 'put'];
 							const promiseArr = methodArr.map(method => {
-								return request[method]('/api/articles')
+								return request[method]('/api/articles/1')
 									.expect(405)
 									.then(({ body: { msg } }) => {
 										expect(msg).to.equal('Method not allowed');
@@ -563,15 +702,14 @@ describe('app', () => {
 						});
 					});
 					describe('/:article_id/comments', () => {
-						describe.only('GET', () => {
-							it.only('status:200, returns array of commments with appropriate properties', () => {
+						describe('GET', () => {
+							it('status:200, returns array of commments with appropriate properties', () => {
 								return request
 									.get('/api/articles/1/comments')
 									.expect(200)
 									.then(({ body: { comments } }) => {
-										console.log(comments.length);
 										expect(comments).to.be.an('array');
-										expect(comments).to.have.length(2);
+										expect(comments).to.have.length(13);
 										expect(comments[0]).to.include.keys(
 											'author',
 											'votes',
@@ -602,7 +740,7 @@ describe('app', () => {
 									.get('/api/articles/1/comments')
 									.expect(200)
 									.then(({ body: { comments } }) => {
-										expect(comments).to.be.sortedBy('created_at');
+										expect(comments).to.be.descendingBy('created_at');
 									});
 							});
 							it('status:200, sorts by query', () => {
@@ -610,7 +748,7 @@ describe('app', () => {
 									.get('/api/articles/1/comments?sort_by=votes')
 									.expect(200)
 									.then(({ body: { comments } }) => {
-										expect(comments).to.be.sortedBy('votes');
+										expect(comments).to.be.descendingBy('votes');
 									});
 							});
 							it('status:400, bad sort query', () => {
@@ -685,7 +823,7 @@ describe('app', () => {
 								return request
 									.post('/api/articles/1/comments')
 									.send({ body: 'This were not good' })
-									.expect(400)
+									.expect(404)
 									.then(({ body: { msg } }) => {
 										expect(msg).to.equal('User Not Found');
 									});

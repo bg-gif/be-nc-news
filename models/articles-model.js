@@ -78,7 +78,6 @@ exports.fetchAllCommentsByArticleId = (
 	offset = 0
 ) => {
 	if (offset > 0) offset = offset * limit - limit;
-	console.log(offset, '<--offset');
 	return connection('comments')
 		.select(
 			'comments.comment_id',
@@ -103,10 +102,19 @@ exports.fetchArticleByTopic = slug => {
 };
 
 exports.sendArticle = (topic, title, author, body) => {
-	const article = { topic, title, author, body };
-	return Promise.all([checkTopic(topic), checkUser(author)]).then(() => {
-		return connection('articles')
-			.insert(article)
-			.returning('*');
-	});
+	if (!body) return Promise.reject({ status: 404, msg: 'Missing Content' });
+	else {
+		const article = { topic, title, author, body };
+		return Promise.all([checkTopic(topic), checkUser(author)]).then(() => {
+			return connection('articles')
+				.insert(article)
+				.returning('*');
+		});
+	}
+};
+
+exports.removeArticleById = article_id => {
+	return connection('articles')
+		.del()
+		.where({ article_id });
 };

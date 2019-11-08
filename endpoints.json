@@ -27,6 +27,31 @@
 			]
 		}
 	},
+	"GET /api/users": {
+		"description": "returns an array of all users on the db on an object with key users",
+		"queries": [],
+		"exampleResponse": {
+			"user": {
+				"users": [
+					{
+						"username": "user1",
+						"avatar_url": "https:www/user1url.com",
+						"name": "user1"
+					},
+					{
+						"username": "user2",
+						"avatar_url": "https:www/user2url.com",
+						"name": "user1"
+					},
+					{
+						"username": "user3",
+						"avatar_url": "https:www/user3url.com",
+						"name": "user1"
+					}
+				]
+			}
+		}
+	},
 	"GET /api/users/:username": {
 		"description": "serves requested user from username",
 		"queries": [],
@@ -101,6 +126,51 @@
 			}
 		}
 	},
+	"POST /api/articles": {
+		"description": "posts new article with author relating to a username and a topic relating to a topic",
+		"queries": [],
+		"exampleBody": {
+			"title": "a title",
+			"topic": "mitch",
+			"author": "icellusedkars",
+			"body": "a body"
+		},
+		"exampleResponse": {
+			"article_id": 13,
+			"title": "a title",
+			"body": "a body",
+			"votes": 0,
+			"topic": "mitch",
+			"author": "icellusedkars",
+			"created_at": "2019-11-08T10: 56: 46.145Z"
+		}
+	},
+	"POST /api/topics": {
+		"description": "posts new topic with slug and description",
+		"queries": [],
+		"exampleBody": {
+			"slug": "internet",
+			"description": "How the internet was a mistake"
+		},
+		"exampleResponse": {
+			"slug": "internet",
+			"description": "How the internet was a mistake"
+		}
+	},
+	"POST /api/users": {
+		"description": "posts new user with username, avatar url and name",
+		"queries": [],
+		"exampleBody": {
+			"username": "slartibartfast",
+			"avatar_url": "https: //www.42dontpanic.com/imgurl",
+			"name": "Richard Vernon"
+		},
+		"exampleResponse": {
+			"username": "slartibartfast",
+			"avatar_url": "https: //www.42dontpanic.com/imgurl",
+			"name": "Richard Vernon"
+		}
+	},
 	"PATCH /api/articles/:article_id": {
 		"description": "updates vote count on article by id",
 		"queries": [],
@@ -137,6 +207,11 @@
 	},
 	"DELETE /api/comments/:comment_id": {
 		"description": "deletes comment by id",
+		"queries": [],
+		"exampleResponse": "n/a"
+	},
+	"DELETE /api/articles/:article_id": {
+		"description": "deletes article by id",
 		"queries": [],
 		"exampleResponse": "n/a"
 	}

@@ -17,7 +17,7 @@ exports.fetchUserById = (username = 'placeholder') => {
 
 exports.checkUser = username => {
 	if (!username) {
-		return Promise.reject({ status: 400, msg: 'User Not Found' });
+		return Promise.reject({ status: 404, msg: 'User Not Found' });
 	}
 	return connection('users')
 		.where({ username })
@@ -26,4 +26,10 @@ exports.checkUser = username => {
 				return Promise.reject({ status: 400, msg: 'User Not Found' });
 			}
 		});
+};
+
+exports.sendUser = (username, avatar_url, name) => {
+	return connection('users')
+		.insert({ username, avatar_url, name })
+		.returning('*');
 };
