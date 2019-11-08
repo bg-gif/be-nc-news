@@ -1,6 +1,8 @@
 const express = require('express');
 const app = express();
 const apiRouter = require('./routers/api-router');
+const loginRouter = require('./routers/login-router');
+const { verify } = require('./controllers/login-controller');
 const {
 	handle404s,
 	handleCustoms,
@@ -10,6 +12,11 @@ const {
 } = require('./errors');
 
 app.use(express.json());
+// app.use((req, res, next) => {
+// 	console.log('headers');
+// 	console.log(req.headers);
+// });
+app.use('/login', loginRouter);
 app.use('/api', apiRouter);
 app.use('/*', handle404s);
 app.use(handle400s);
