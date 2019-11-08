@@ -452,6 +452,22 @@ describe('app', () => {
 								expect(articles.length).to.equal(2);
 							});
 					});
+					it('status:400, non numerical limit', () => {
+						return request
+							.get('/api/articles?limit=apples')
+							.expect(400)
+							.then(({ body: { msg } }) => {
+								expect(msg).to.equal('Bad Limit');
+							});
+					});
+					it('status:400, non numerical page number', () => {
+						return request
+							.get('/api/articles?limit=10&p=banana')
+							.expect(400)
+							.then(({ body: { msg } }) => {
+								expect(msg).to.equal('Bad Limit');
+							});
+					});
 					it('status:400, invalid author query', () => {
 						return request
 							.get('/api/articles?author=iellusedkars')
@@ -818,6 +834,22 @@ describe('app', () => {
 									.expect(200)
 									.then(({ body: { comments } }) => {
 										expect(comments.length).to.equal(3);
+									});
+							});
+							it('status:400, non numerical limit', () => {
+								return request
+									.get('/api/articles/1/comments?limit=apples')
+									.expect(400)
+									.then(({ body: { msg } }) => {
+										expect(msg).to.equal('Bad Limit');
+									});
+							});
+							it('status:400, non numerical page number', () => {
+								return request
+									.get('/api/articles/1/comments?limit=10&p=banana')
+									.expect(400)
+									.then(({ body: { msg } }) => {
+										expect(msg).to.equal('Bad Limit');
 									});
 							});
 							it('status:200, valid article, no comments', () => {

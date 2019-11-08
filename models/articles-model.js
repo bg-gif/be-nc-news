@@ -10,6 +10,12 @@ exports.fetchAllArticles = (
 	limit,
 	offset = 0
 ) => {
+	if (limit !== undefined && !Number(limit)) {
+		return Promise.reject({ status: 400, msg: 'Bad Limit' });
+	}
+	if (offset !== 0 && !Number(offset)) {
+		return Promise.reject({ status: 400, msg: 'Bad Limit' });
+	}
 	if (offset > 0) offset = offset * limit - limit;
 	return connection('articles')
 		.leftJoin('comments', 'articles.article_id', 'comments.article_id')
@@ -78,6 +84,12 @@ exports.fetchAllCommentsByArticleId = (
 	limit,
 	offset = 0
 ) => {
+	if (limit !== undefined && !Number(limit)) {
+		return Promise.reject({ status: 400, msg: 'Bad Limit' });
+	}
+	if (offset !== 0 && !Number(offset)) {
+		return Promise.reject({ status: 400, msg: 'Bad Limit' });
+	}
 	if (offset > 0) offset = offset * limit - limit;
 	return connection('comments')
 		.select(
