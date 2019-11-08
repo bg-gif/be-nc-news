@@ -372,7 +372,7 @@ describe('app', () => {
 							});
 					});
 				});
-				describe.only('POST', () => {
+				describe('POST', () => {
 					it('status 201: responds with posted article', () => {
 						return request
 							.post('/api/articles')
@@ -563,14 +563,15 @@ describe('app', () => {
 						});
 					});
 					describe('/:article_id/comments', () => {
-						describe('GET', () => {
-							it('status:200, returns array of commments with appropriate properties', () => {
+						describe.only('GET', () => {
+							it.only('status:200, returns array of commments with appropriate properties', () => {
 								return request
 									.get('/api/articles/1/comments')
 									.expect(200)
 									.then(({ body: { comments } }) => {
+										console.log(comments.length);
 										expect(comments).to.be.an('array');
-										expect(comments).to.have.length(13);
+										expect(comments).to.have.length(2);
 										expect(comments[0]).to.include.keys(
 											'author',
 											'votes',

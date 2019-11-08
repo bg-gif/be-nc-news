@@ -73,11 +73,12 @@ exports.sendComment = (body, author, article_id) => {
 exports.fetchAllCommentsByArticleId = (
 	article_id,
 	sort_by = 'created_at',
-	order = 'asc',
+	order = 'desc',
 	limit,
 	offset = 0
 ) => {
 	if (offset > 0) offset = offset * limit - limit;
+	console.log(offset, '<--offset');
 	return connection('comments')
 		.select(
 			'comments.comment_id',
