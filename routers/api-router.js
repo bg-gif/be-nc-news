@@ -14,7 +14,7 @@ apiRouter.use('/topics', topicsRouter);
 apiRouter.use('/users', usersRouter);
 apiRouter.use('/articles', articlesRouter);
 apiRouter.use('/comments', commentsRouter);
-apiRoute
+apiRouter
 	.route('/')
 	.get(endPoints)
 	.all(handle405s);
