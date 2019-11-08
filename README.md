@@ -48,13 +48,13 @@ npm i chai mocha supertest chai-sorted -D
 
 The program comes with many different scripts to make designing and testing easier.
 
-**setup-dbs** - Creates the database for the information to go into.
-**seed** - Seeds the database with tables and appropriate column titles for storing the information.
-**migrate-latest** - Fills the tables with information from the data folder, defaulting to dev data
-**migrate-rollback** - Takes the tables back to their previous form before the last migration.
-**dev** - Sets up the database, tables, and fills tables with dev data and starts the server listening on port 9090.
-**test-utils** - Runs the spec file for the test utilities used to manipulate the data to be able to be parsed into the tables.
-**test** - Runs the spec file for testing the server, responses and methods using supertest
+- **setup-dbs** - Creates the database for the information to go into.
+- **seed** - Seeds the database with tables and appropriate column titles for storing the information.
+- **migrate-latest** - Fills the tables with information from the data folder, defaulting to dev data
+- **migrate-rollback** - Takes the tables back to their previous form before the last migration.
+- **dev** - Sets up the database, tables, and fills tables with dev data and starts the server listening on port 9090.
+- **test-utils** - Runs the spec file for the test utilities used to manipulate the data to be able to be parsed into the tables.
+- **test** - Runs the spec file for testing the server, responses and methods using supertest
 
 ## Test Utils
 
