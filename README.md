@@ -60,13 +60,13 @@ The program comes with many different scripts to make designing and testing easi
 
 There are a number of test utilities included to manipulate the data to fit the design of the tables.
 
-**formatDates** - changes the data from a unix timestamp to standard timestamp.
+- **formatDates** - changes the data from a unix timestamp to standard timestamp.
 
 _Example_
 
 _1542284514171 converted to 2018-11-15T12:21:54.171Z_
 
-**makeRefObj** - makes a reference object for _formatComments_ using the title and object id from each article.
+- **makeRefObj** - makes a reference object for _formatComments_ using the title and object id from each article.
 
 _Example_
 
@@ -85,7 +85,7 @@ _converted to_
 
 {Living in the shadow of a great man: 1}
 
-**formatComments** - uses the reference object to manipulate comment data from the data folder to format correctly for the comments table, namely changeing the _*created_by*_ key into an _author_ key and changes the _belongs_to_ key to an _article_id_ key using the reference object.
+- **formatComments** - uses the reference object to manipulate comment data from the data folder to format correctly for the comments table, namely changeing the _*created_by*_ key into an _author_ key and changes the _belongs_to_ key to an _article_id_ key using the reference object.
 
 _Example_
 
@@ -127,11 +127,11 @@ npm test
 
 ## Utility Spec File
 
-**formatDates** - Tests to make sure that the function returns a new array, and converts the timestamp from a unix code to a js date obj and that it converts the time for every object in the array of objects.
+- **formatDates** - Tests to make sure that the function returns a new array, and converts the timestamp from a unix code to a js date obj and that it converts the time for every object in the array of objects.
 
-**makeRefObj** - Tests to make sure that the original array is not mutated, and that each object in the original array is converted into the reference object with a key of the original title and the a value of the article id.
+- **makeRefObj** - Tests to make sure that the original array is not mutated, and that each object in the original array is converted into the reference object with a key of the original title and the a value of the article id.
 
-**formatComments** - Tests to make sure the original array is not mutated, the created_by key is changed to be called author and the belongs to key is replaced with the article id key.
+- **formatComments** - Tests to make sure the original array is not mutated, the created_by key is changed to be called author and the belongs to key is replaced with the article id key.
 
 ## App Testing Spec
 
