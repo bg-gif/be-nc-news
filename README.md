@@ -22,11 +22,11 @@ npm i express pg knex
 
 Linux/Non-Apple Users will need to make their own config file for knex to run correctly
 
-This should be made in _root/private/config.js_
+This should be made in --- _root/private/config.js_
 
 Your config file should include your user name and password on the export object
 
-# Example
+## Example
 
 exports.username = 'username';
 exports.password = 'password';
@@ -61,6 +61,8 @@ The program comes with many different scripts to make designing and testing easi
 There are a number of test utilities included to manipulate the data to fit the design of the tables.
 
 **formatDates** - changes the data from a unix timestamp to standard timestamp.
+
+_Example_
 
 _1542284514171 converted to 2018-11-15T12:21:54.171Z_
 
@@ -107,7 +109,7 @@ votes: 14,
 created_at: 1479818163389
 }
 
-### Spec Test Files
+## Spec Test Files
 
 There are two spec files for testing
 
@@ -123,7 +125,7 @@ _App Testing Spec_
 npm test
 ```
 
-### Utility Spec File
+## Utility Spec File
 
 **formatDates** - Tests to make sure that the function returns a new array, and converts the timestamp from a unix code to a js date obj and that it converts the time for every object in the array of objects.
 
@@ -131,7 +133,7 @@ npm test
 
 **formatComments** - Tests to make sure the original array is not mutated, the created_by key is changed to be called author and the belongs to key is replaced with the article id key.
 
-### App Testing Spec
+## App Testing Spec
 
 Checks all expected and unexpected endpoints to make sure that expected values are returned and that only the desired data can be inputted. Also tests to make sure that if erronius data is inputted, an error is thrown back to the user to explaining the error.
 
