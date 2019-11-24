@@ -14,12 +14,12 @@ exports.postLogin = (req, res, next) => {
 };
 
 exports.verify = (req, res, next) => {
-	console.log('headers');
 	console.log(req.headers);
 	const { authorization } = req.headers;
 	const token = authorization.split(' ')[1];
 	console.log(token, '<token');
 	jwt.verify(token, JWT_SECRET, (err, res) => {
-		console.log('something?!');
+		if (err) next({ status: 401, msg: 'Unauthorized' });
+		else next();
 	});
 };
