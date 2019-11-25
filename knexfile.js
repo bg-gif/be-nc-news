@@ -1,6 +1,6 @@
+const { DB_URL } = process.env;
 const ENV = process.env.NODE_ENV || "development";
 const { username, password } = require("./private/config");
-const { DB_URL } = process.env;
 
 const baseConfig = {
   client: "pg",
