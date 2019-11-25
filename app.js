@@ -1,4 +1,5 @@
 const express = require("express");
+const cors = require("cors");
 const app = express();
 const apiRouter = require("./routers/api-router");
 // const loginRouter = require('./routers/login-router');
@@ -11,6 +12,7 @@ const {
   handle422s
 } = require("./errors");
 
+app.use(cors());
 app.use(express.json());
 // app.use('/login', loginRouter);
 // app.use(verify);
