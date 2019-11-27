@@ -13,7 +13,7 @@ exports.up = function(knex) {
       .string("author")
       .references("username")
       .inTable("users")
-      .notNullable.onDelete("CASCADE");
+      .onDelete("CASCADE").notNullable;
     table.timestamp("created_at").defaultTo(knex.fn.now());
   });
 };
