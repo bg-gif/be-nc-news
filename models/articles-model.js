@@ -130,5 +130,6 @@ exports.sendArticle = (topic, title, author, body) => {
 exports.removeArticleById = article_id => {
   return connection("articles")
     .del()
-    .where({ article_id });
+    .where({ article_id })
+    .then(res => console.log(res) || res);
 };
