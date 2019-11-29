@@ -214,6 +214,17 @@ describe('app', () => {
 								expect(msg).to.equal('Bad Request');
 							});
 					});
+					it('status: 400 Topic already exists', () => {
+						return request
+							.post('/api/topics')
+							.send({
+								slug: 'cats',
+								description: 'something something coding'
+							})
+							.expect(400).then(({body:{msg}})=>{
+								expect(msg).to.equal('Bad Request')
+							})				
+					});
 				});
 				describe('INVALID METHODS', () => {
 					it('status: 405, reponds with method not allowed', () => {
@@ -317,6 +328,18 @@ describe('app', () => {
 							.then(({ body: { msg } }) => {
 								expect(msg).to.equal('Bad Request');
 							});
+					});
+					it('status: 400 Topic already exists', () => {
+						return request
+							.post('/api/users')
+							.send({
+								username: 'rogersop',
+								name: 'paul',
+								avatar_url: 'https://avatars2.githubusercontent.com/u/24394918?s=400&v=4',
+							})
+							.expect(400).then(({ body: { msg } }) => {
+								expect(msg).to.equal('Bad Request')
+							})
 					});
 				});
 				describe('INVALID METHODS', () => {
