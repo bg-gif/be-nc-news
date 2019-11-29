@@ -2,7 +2,8 @@ module.exports = [
   {
     username: "tickle122",
     name: "Tom Tickle",
-		avatar_url: "https://encrypted-tbn0.gstatic.com/images?q=tbn%3AANd9GcQ0L1r_LVfuzBVSD8i_LjOsB0-lGa1cRavAtSmw-tTDiHFWWuJC"
+    avatar_url:
+      "https://encrypted-tbn0.gstatic.com/images?q=tbn%3AANd9GcQ0L1r_LVfuzBVSD8i_LjOsB0-lGa1cRavAtSmw-tTDiHFWWuJC"
   },
   {
     username: "grumpy19",
@@ -19,7 +20,9 @@ module.exports = [
   {
     username: "cooljmessy",
     name: "Peter Messy",
-		avatar_url: "https://encrypted-tbn0.gstatic.com/images?q=tbn%3AANd9GcQEV_KohefKoSKCUIJCKcYQo3lk10ikQXoofyjcD_JjQRpfEyGR"
+    avatar_url:
+      "https://encrypted-tbn0.gstatic.com/images?q=tbn%3AANd9GcQEV_KohefKoSKCUIJCKcYQo3lk10ikQXoofyjcD_JjQRpfEyGR"
+  },
   {
     username: "weegembump",
     name: "Gemma Bump",
