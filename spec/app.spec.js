@@ -366,6 +366,45 @@ describe('app', () => {
 							return Promise.all[promiseArr];
 						});
 					});
+					describe('/comments', () => {
+						describe('GET', () => {
+							it('status:200, returns all comments made by user', () => {
+								return request.get('/api/users/butter_bridge/comments').expect(200).then(({ body: { comments } }) => {
+									expect(comments).to.be.an('array')
+								})
+							});
+							it('status:404, responds with User does not exist', () => {
+								return request
+									.get('/api/users/stevey/comments')
+									.expect(404)
+									.then(({ body: { msg } }) => {
+										expect(msg).to.equal('Not Found');
+									});
+							});
+							it('status:404, invalid username data type', () => {
+								return request
+									.get('/api/users/11223/comments')
+									.expect(404)
+									.then(({ body: { msg } }) => {
+										expect(msg).to.equal('Not Found');
+									});
+							});
+						});
+						describe('INVALID METHODS', () => {
+							it('status: 405, reponds with method not allowed', () => {
+								const methodArr = ['post', 'put', 'patch', 'delete'];
+								const promiseArr = methodArr.map(method => {
+									return request[method]('/api/users/butter_bridge/comments')
+										.expect(405)
+										.then(({ body: { msg } }) => {
+											expect(msg).to.equal('Method not allowed');
+										});
+								});
+								return Promise.all[promiseArr];
+							});
+						});
+
+					});
 				});
 			});
 			describe('/articles', () => {
@@ -706,7 +745,7 @@ describe('app', () => {
 					});
 					describe('DELETE', () => {
 						it('status:204, returns no content', () => {
-							return request.delete('/api/articles/1').expect(204);
+							return request.delete('/api/articles/2').expect(204);
 						});
 						it('status:400, bad article id type', () => {
 							return request

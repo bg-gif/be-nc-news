@@ -4,7 +4,7 @@ const { checkTopic } = require("../models/topics-model");
 
 exports.fetchAllArticles = (
   sort_by = "created_at",
-  order = "asc",
+  order = "desc",
   author,
   topic,
   limit,

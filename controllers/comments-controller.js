@@ -1,8 +1,10 @@
 const {
   updateCommentById,
   removeCommentById,
-  checkCommentId
+  checkCommentId,
+  fetchCommentsByUserId
 } = require("../models/comments-model");
+const { fetchUserById } = require("../models/users-model");
 
 exports.patchCommentById = (req, res, next) => {
   const { comment_id } = req.params;
