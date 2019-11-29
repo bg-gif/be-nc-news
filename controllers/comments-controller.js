@@ -1,16 +1,15 @@
 const {
   updateCommentById,
   removeCommentById,
-  checkCommentId,
-  fetchCommentsByUserId
+  checkCommentId
 } = require("../models/comments-model");
 const { fetchUserById } = require("../models/users-model");
 
 exports.patchCommentById = (req, res, next) => {
   const { comment_id } = req.params;
-  const { inc_votes } = req.body;
+  const { inc_votes, body } = req.body;
   return Promise.all([
-    updateCommentById(comment_id, inc_votes),
+    updateCommentById(comment_id, inc_votes, body),
     checkCommentId(comment_id)
   ])
     .then(([[comment]]) => {

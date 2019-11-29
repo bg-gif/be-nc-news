@@ -112,6 +112,23 @@ describe('app', () => {
 									expect(msg).to.equal('Bad Request');
 								});
 						});
+						it('status:200, updates comment body', () => {
+							return request
+								.patch('/api/comments/1')
+								.send({ body: "I updated this!" })
+								.expect(200)
+								.then(({ body: { comment } }) => {
+									expect(comment).to.eql({
+										comment_id: 1,
+										author: 'butter_bridge',
+										article_id: 9,
+										votes: 16,
+										created_at: '2017-11-22T12:36:03.389Z',
+										body:
+											"I updated this!"
+									});
+								});
+						});
 					});
 					describe('DELETE', () => {
 						it('status:204, returns no content', () => {

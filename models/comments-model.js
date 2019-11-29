@@ -1,10 +1,11 @@
 const connection = require("../db/connection");
 
-exports.updateCommentById = (comment_id, newVotes) => {
+exports.updateCommentById = (comment_id, newVotes, body) => {
   return connection("comments")
     .where("comment_id", comment_id)
     .modify(query => {
       if (newVotes) query.increment("votes", newVotes);
+      if (body) query.update({ body });
     })
     .returning("*");
 };
